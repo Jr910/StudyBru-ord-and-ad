@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StudyBru — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --card: #161616;
+    --border: #2a2a2a;
+    --accent: #c8f135;
+    --accent2: #ff4d6d;
+    --text: #f0f0f0;
+    --muted: #888;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+
+  /* LOGIN */
+  #login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;}
+  .login-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;margin-bottom:8px;}
+  .login-logo span{color:var(--accent);}
+  .login-sub{color:var(--muted);font-size:0.85rem;margin-bottom:32px;}
+  .login-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px 24px;width:100%;max-width:360px;}
+  .login-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:16px;}
+  .pin-input{width:100%;background:#1a1a1a;border:1px solid var(--border);border-radius:10px;padding:14px;color:var(--text);font-family:'Syne',sans-serif;font-size:1.4rem;letter-spacing:8px;text-align:center;outline:none;margin-bottom:12px;}
+  .pin-input:focus{border-color:var(--accent);}
+  .btn-unlock{width:100%;padding:14px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);font-family:'Syne',sans-serif;font-weight:800;font-size:0.95rem;cursor:pointer;}
+  .login-err{color:var(--accent2);font-size:0.8rem;text-align:center;margin-top:8px;display:none;}
+
+  /* ADMIN APP */
+  #admin-app{display:none;}
+  nav{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100;}
+  .nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;}
+  .nav-logo span{color:var(--accent);}
+  .nav-right{display:flex;gap:8px;align-items:center;}
+  .admin-badge{background:#1a1f0a;color:var(--accent);border:1px solid var(--accent);border-radius:6px;padding:4px 10px;font-size:0.75rem;font-weight:600;}
+  .btn-lock{padding:8px 14px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:0.8rem;cursor:pointer;}
+  .btn-lock:hover{border-color:var(--accent2);color:var(--accent2);}
+
+  /* TABS */
+  .tab-bar{display:flex;gap:4px;padding:12px 20px;border-bottom:1px solid var(--border);overflow-x:auto;}
+  .tab-btn{padding:8px 16px;border-radius:30px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:0.82rem;cursor:pointer;white-space:nowrap;transition:all .2s;}
+  .tab-btn.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600;}
+
+  /* CONTENT */
+  .admin-content{padding:20px;max-width:700px;margin:0 auto;}
+
+  /* STATS */
+  .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px;}
+  .stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;}
+  .stat-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;color:var(--accent);}
+  .stat-label{font-size:0.78rem;color:var(--muted);margin-top:2px;}
+
+  /* SECTION LABEL */
+  .section-label{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+  .section-label .dot{width:8px;height:8px;background:var(--accent);border-radius:50%;display:inline-block;margin-right:8px;}
+
+  /* VERIFY BOX */
+  .verify-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:20px;}
+  .verify-row{display:flex;gap:10px;margin-bottom:10px;}
+  .verify-input{flex:1;background:#1a1a1a;border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;}
+  .verify-input:focus{border-color:var(--accent);}
+  .btn-check{padding:11px 18px;background:var(--accent);color:#000;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;}
+  #verify-result{font-size:0.85rem;padding:4px 0;}
+
+  /* ORDERS LIST */
+  .order-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;}
+  .order-item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .order-ref{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;}
+  .order-meta{font-size:0.8rem;color:var(--muted);margin-bottom:10px;}
+  .status-select{background:#1a1a1a;border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.8rem;cursor:pointer;outline:none;}
+  .status-badge{padding:4px 12px;border-radius:30px;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+  .status-pending{background:#2a1f00;color:#f9a825;}
+  .status-confirmed{background:#1a1f0a;color:var(--accent);}
+  .status-paid{background:#0d2116;color:#4ade80;}
+  .status-delivered{background:#0d1a2a;color:#60a5fa;}
+  .status-cancelled{background:#2a0d0d;color:var(--accent2);}
+  .order-detail-row{display:flex;justify-content:space-between;font-size:0.8rem;padding:4px 0;border-bottom:1px solid #1a1a1a;}
+  .order-detail-row:last-child{border:none;}
+  .order-detail-row .key{color:var(--muted);}
+  .order-detail-row .val{font-weight:600;}
+
+  .action-row{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+  .btn-action{padding:10px 16px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.82rem;cursor:pointer;transition:all .2s;}
+  .btn-action:hover{background:#1a1a1a;border-color:#555;}
+  .btn-action.green{border-color:var(--accent);color:var(--accent);}
+
+  /* ADD ORDER FORM */
+  .add-form{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px;display:none;}
+  .add-form.open{display:block;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .form-group{margin-bottom:0;}
+  .form-group.full{grid-column:1/-1;}
+  .form-group label{display:block;font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+  .form-group input,.form-group select,.form-group textarea{width:100%;background:#1a1a1a;border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.88rem;outline:none;}
+  .form-group input:focus,.form-group select:focus{border-color:var(--accent);}
+  .form-group select option{background:#1a1a1a;}
+  .form-actions{display:flex;gap:10px;margin-top:16px;}
+  .btn-save{flex:1;padding:12px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;}
+  .btn-cancel{padding:12px 18px;background:transparent;border:1px solid var(--border);border-radius:var(--radius);color:var(--muted);font-family:'DM Sans',sans-serif;cursor:pointer;}
+
+  /* GOOGLE SHEET EMBED */
+  .sheet-container{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;}
+  .sheet-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+  .sheet-title{font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;}
+  .sheet-hint{font-size:0.75rem;color:var(--muted);}
+  .sheet-url-row{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;gap:10px;}
+  .sheet-url-input{flex:1;background:#1a1a1a;border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.82rem;outline:none;}
+  .sheet-url-input:focus{border-color:var(--accent);}
+  .btn-embed{padding:10px 16px;background:var(--accent);color:#000;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer;}
+  .sheet-frame-wrap{position:relative;height:420px;background:#111;}
+  .sheet-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--muted);gap:10px;text-align:center;padding:24px;}
+  .sheet-placeholder .icon{font-size:2.5rem;}
+  .sheet-placeholder p{font-size:0.85rem;line-height:1.5;}
+  .sheet-placeholder small{font-size:0.75rem;color:#555;}
+  #sheet-iframe{width:100%;height:100%;border:none;display:none;}
+
+  .empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
+  .empty-state .icon{font-size:2rem;margin-bottom:10px;}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  .fade-up{animation:fadeUp .3s ease forwards;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-logo">Study<span>Bru</span> 🎒</div>
+  <div class="login-sub">Admin access only</div>
+  <div class="login-box">
+    <div class="login-title">🔐 Enter Admin PIN</div>
+    <input class="pin-input" id="admin-pin-input" type="password" maxlength="6" placeholder="••••••" oninput="if(this.value.length===6) tryUnlock()"/>
+    <button class="btn-unlock" onclick="tryUnlock()">UNLOCK 🔓</button>
+    <div class="login-err" id="login-err">❌ Wrong PIN — try again</div>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="admin-app">
+  <nav>
+    <div class="nav-logo">Study<span>Bru</span> Admin 🎒</div>
+    <div class="nav-right">
+      <span class="admin-badge">ADMIN</span>
+      <button class="btn-lock" onclick="lock()">🔒 Lock</button>
+    </div>
+  </nav>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('orders',this)">📦 Orders</button>
+    <button class="tab-btn" onclick="switchTab('sheet',this)">📊 Google Sheet</button>
+  </div>
+
+  <!-- ORDERS TAB -->
+  <div id="tab-orders" class="admin-content">
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-val" id="stat-total">0</div><div class="stat-label">Total Orders</div></div>
+      <div class="stat-card"><div class="stat-val" id="stat-pending">0</div><div class="stat-label">Pending</div></div>
+      <div class="stat-card"><div class="stat-val" id="stat-revenue">R0</div><div class="stat-label">Revenue</div></div>
+      <div class="stat-card"><div class="stat-val" id="stat-done">0</div><div class="stat-label">Delivered</div></div>
+    </div>
+
+    <!-- VERIFY -->
+    <div class="verify-box">
+      <div class="section-label" style="margin-bottom:12px;"><span><span class="dot"></span>Verify Customer PIN</span></div>
+      <div class="verify-row">
+        <input class="verify-input" id="verify-input" type="text" placeholder="Enter customer PIN"/>
+        <button class="btn-check" onclick="verifyPin()">CHECK</button>
+      </div>
+      <div id="verify-result"></div>
+    </div>
+
+    <!-- ACTION ROW -->
+    <div class="action-row">
+      <button class="btn-action green" onclick="toggleAddForm()">+ Add Order</button>
+      <button class="btn-action" onclick="exportCSV()">📊 Export CSV</button>
+      <button class="btn-action" onclick="summaryToWA()">💬 Summary to WA</button>
+    </div>
+
+    <!-- ADD ORDER FORM -->
+    <div class="add-form" id="add-form">
+      <div class="section-label"><span><span class="dot"></span>Add Order Manually</span></div>
+      <div class="form-grid">
+        <div class="form-group"><label>Full Name</label><input id="af-name" type="text" placeholder="Customer name"/></div>
+        <div class="form-group"><label>WhatsApp Number</label><input id="af-wa" type="tel" placeholder="e.g. 082 345 6789"/></div>
+        <div class="form-group"><label>School</label><input id="af-school" type="text" placeholder="School name"/></div>
+        <div class="form-group"><label>Grade</label>
+          <select id="af-grade">
+            <option value="">Select grade</option>
+            <option>Grade 8</option><option>Grade 9</option><option>Grade 10</option><option>Grade 11</option><option>Grade 12</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Pack</label>
+          <select id="af-pack">
+            <option value="">Select pack</option>
+            <option value="Survival Pack|150">Survival Pack — R150</option>
+            <option value="Ace's Pack|250">Ace's Pack — R250</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Quantity</label><input id="af-qty" type="number" value="1" min="1" max="10"/></div>
+        <div class="form-group"><label>Payment Method</label>
+          <select id="af-payment">
+            <option value="">Select payment</option>
+            <option>Cash on delivery</option><option>EFT / PayShap</option><option>Card (Yoco)</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Delivery Date</label><input id="af-date" type="date"/></div>
+        <div class="form-group full"><label>Notes (optional)</label><input id="af-notes" type="text" placeholder="Any notes..."/></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-cancel" onclick="toggleAddForm()">Cancel</button>
+        <button class="btn-save" onclick="saveManualOrder()">SAVE ORDER</button>
+      </div>
+    </div>
+
+    <!-- FILTER TABS -->
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;">
+      <button class="tab-btn active" onclick="filterOrders('all',this)" style="font-size:0.75rem;padding:6px 12px;">All</button>
+      <button class="tab-btn" onclick="filterOrders('pending',this)" style="font-size:0.75rem;padding:6px 12px;">Pending</button>
+      <button class="tab-btn" onclick="filterOrders('paid',this)" style="font-size:0.75rem;padding:6px 12px;">Paid</button>
+      <button class="tab-btn" onclick="filterOrders('delivered',this)" style="font-size:0.75rem;padding:6px 12px;">Delivered</button>
+      <button class="tab-btn" onclick="filterOrders('cancelled',this)" style="font-size:0.75rem;padding:6px 12px;">Cancelled</button>
+    </div>
+
+    <div id="orders-list"></div>
+  </div>
+
+  <!-- SHEET TAB -->
+  <div id="tab-sheet" class="admin-content" style="display:none;">
+    <div class="section-label"><span class="dot"></span>Google Sheet Tracker</div>
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:16px;">Paste your Google Sheet <strong>embed link</strong> below to connect your order tracker spreadsheet. To get the embed link: <em>File → Share → Publish to web → Copy embed code URL</em>.</p>
+
+    <div class="sheet-container">
+      <div class="sheet-header">
+        <span class="sheet-title">📊 Linked Spreadsheet</span>
+        <span class="sheet-hint" id="sheet-status-label">Not connected</span>
+      </div>
+      <div class="sheet-url-row">
+        <input class="sheet-url-input" id="sheet-url" placeholder="Paste Google Sheet embed URL here..."/>
+        <button class="btn-embed" onclick="embedSheet()">LOAD</button>
+      </div>
+      <div class="sheet-frame-wrap">
+        <div class="sheet-placeholder" id="sheet-placeholder">
+          <div class="icon">📋</div>
+          <p>Your Google Sheet will appear here once you paste the embed link above.</p>
+          <small>Go to your Google Sheet → File → Share → Publish to web → Select "Entire Document" + "Web page" → Publish → Copy the link</small>
+        </div>
+        <iframe id="sheet-iframe"></iframe>
+      </div>
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;margin-bottom:10px;">📖 How to set up your Google Sheet</div>
+      <ol style="font-size:0.82rem;color:var(--muted);line-height:1.9;padding-left:18px;">
+        <li>Open <a href="https://sheets.google.com" target="_blank" style="color:var(--accent)">Google Sheets</a> and create a new spreadsheet</li>
+        <li>Add columns: <strong>Ref | PIN | Name | WhatsApp | School | Grade | Pack | Qty | Payment | Date | Total | Status | Notes | Timestamp</strong></li>
+        <li>Go to <strong>File → Share → Publish to web</strong></li>
+        <li>Select <strong>"Entire Document"</strong> and <strong>"Web page"</strong></li>
+        <li>Click <strong>Publish</strong> and copy the URL</li>
+        <li>Paste the URL in the box above and click <strong>LOAD</strong></li>
+      </ol>
+      <div style="margin-top:14px;padding:12px;background:#1a1f0a;border-radius:10px;border:1px solid #2a3a10;">
+        <p style="font-size:0.8rem;color:var(--accent);">💡 Pro tip: Use <a href="https://zapier.com" target="_blank" style="color:var(--accent)">Zapier</a> or <a href="https://make.com" target="_blank" style="color:var(--accent)">Make.com</a> to auto-populate your Sheet whenever a new order is placed on your order page.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const ADMIN_PIN = '1234'; // Change this to your real PIN
+  const OWNER_WA = '27696746666';
+  let currentFilter = 'all';
+
+  function tryUnlock() {
+    const pin = document.getElementById('admin-pin-input').value;
+    if (pin === ADMIN_PIN) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('admin-app').style.display = 'block';
+      refreshOrders();
+    } else {
+      document.getElementById('login-err').style.display = 'block';
+      document.getElementById('admin-pin-input').value = '';
+    }
+  }
+
+  function lock() {
+    document.getElementById('admin-app').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('admin-pin-input').value = '';
+    document.getElementById('login-err').style.display = 'none';
+  }
+
+  function switchTab(tab, btn) {
+    document.querySelectorAll('.tab-bar .tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-orders').style.display = tab === 'orders' ? 'block' : 'none';
+    document.getElementById('tab-sheet').style.display = tab === 'sheet' ? 'block' : 'none';
+  }
+
+  function getOrders() { return JSON.parse(localStorage.getItem('sb_orders') || '[]'); }
+  function saveOrders(orders) { localStorage.setItem('sb_orders', JSON.stringify(orders)); }
+
+  function refreshOrders() {
+    const orders = getOrders();
+    // Stats
+    document.getElementById('stat-total').textContent = orders.length;
+    document.getElementById('stat-pending').textContent = orders.filter(o => o.status === 'pending').length;
+    document.getElementById('stat-revenue').textContent = 'R' + orders.reduce((s,o) => s + (o.total || 0), 0);
+    document.getElementById('stat-done').textContent = orders.filter(o => o.status === 'delivered').length;
+    // List
+    renderOrders(orders, currentFilter);
+  }
+
+  function filterOrders(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('#tab-orders .tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderOrders(getOrders(), filter);
+  }
+
+  function renderOrders(orders, filter) {
+    const filtered = filter === 'all' ? orders : orders.filter(o => o.status === filter);
+    const el = document.getElementById('orders-list');
+    if (!filtered.length) {
+      el.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>No orders found</p></div>`;
+      return;
+    }
+    el.innerHTML = [...filtered].reverse().map(o => `
+      <div class="order-item fade-up">
+        <div class="order-item-header">
+          <span class="order-ref">${o.ref}</span>
+          <select class="status-select" onchange="updateStatus('${o.ref}', this.value)">
+            <option value="pending" ${o.status==='pending'?'selected':''}>⏳ Pending</option>
+            <option value="confirmed" ${o.status==='confirmed'?'selected':''}>✓ Confirmed</option>
+            <option value="paid" ${o.status==='paid'?'selected':''}>💳 Paid</option>
+            <option value="delivered" ${o.status==='delivered'?'selected':''}>📦 Delivered</option>
+            <option value="cancelled" ${o.status==='cancelled'?'selected':''}>❌ Cancelled</option>
+          </select>
+        </div>
+        <div class="order-meta">${o.name} • ${o.school} • ${o.grade} • ${o.pack}</div>
+        <div class="order-detail-row"><span class="key">WhatsApp</span><span class="val"><a href="https://wa.me/27${o.wa?.replace(/\D/g,'').replace(/^0/,'')}?text=Hi ${encodeURIComponent(o.name)}, your Study Snack Bru order (${o.ref}) is confirmed! 🎒" target="_blank" style="color:var(--accent);text-decoration:none;">💬 ${o.wa}</a></span></div>
+        <div class="order-detail-row"><span class="key">Pack × Qty</span><span class="val">${o.pack} ×${o.qty}</span></div>
+        <div class="order-detail-row"><span class="key">Delivery</span><span class="val">${o.date}</span></div>
+        <div class="order-detail-row"><span class="key">Payment</span><span class="val">${o.payment}</span></div>
+        <div class="order-detail-row"><span class="key">Total</span><span class="val" style="color:var(--accent)">R${o.total}</span></div>
+        <div class="order-detail-row"><span class="key">PIN</span><span class="val" style="letter-spacing:3px">${o.pin}</span></div>
+        ${o.notes ? `<div class="order-detail-row"><span class="key">Notes</span><span class="val">${o.notes}</span></div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  function updateStatus(ref, status) {
+    const orders = getOrders();
+    const idx = orders.findIndex(o => o.ref === ref);
+    if (idx >= 0) { orders[idx].status = status; saveOrders(orders); refreshOrders(); }
+  }
+
+  function verifyPin() {
+    const pin = document.getElementById('verify-input').value.trim();
+    const orders = getOrders();
+    const o = orders.find(x => x.pin === pin);
+    const el = document.getElementById('verify-result');
+    if (!o) { el.innerHTML = `<span style="color:var(--accent2)">❌ PIN not found</span>`; return; }
+    el.innerHTML = `<span style="color:var(--accent)">✅ Valid PIN — ${o.name}, ${o.pack}, Ref: ${o.ref}</span>`;
+  }
+
+  function toggleAddForm() {
+    const f = document.getElementById('add-form');
+    f.classList.toggle('open');
+  }
+
+  function saveManualOrder() {
+    const name = document.getElementById('af-name').value.trim();
+    const wa = document.getElementById('af-wa').value.trim();
+    const school = document.getElementById('af-school').value.trim();
+    const grade = document.getElementById('af-grade').value;
+    const packVal = document.getElementById('af-pack').value;
+    const qty = parseInt(document.getElementById('af-qty').value) || 1;
+    const payment = document.getElementById('af-payment').value;
+    const date = document.getElementById('af-date').value;
+    const notes = document.getElementById('af-notes').value.trim();
+    if (!name || !packVal) { alert('Please fill in at least name and pack.'); return; }
+    const [pack, price] = packVal.split('|');
+    const pin = String(Math.floor(100000 + Math.random() * 900000));
+    const ref = 'SB-' + Math.floor(1000 + Math.random() * 9000);
+    const total = parseInt(price) * qty;
+    const orders = getOrders();
+    orders.push({ ref, pin, name, wa, school, grade, date, pack, qty, payment, notes, total, status: 'pending', timestamp: Date.now() });
+    saveOrders(orders);
+    refreshOrders();
+    toggleAddForm();
+  }
+
+  function exportCSV() {
+    const orders = getOrders();
+    if (!orders.length) { alert('No orders to export.'); return; }
+    const headers = ['Ref','PIN','Name','WhatsApp','School','Grade','Pack','Qty','Payment','Date','Total','Status','Notes'];
+    const rows = orders.map(o => [o.ref,o.pin,o.name,o.wa,o.school,o.grade,o.pack,o.qty,o.payment,o.date,o.total,o.status,o.notes||'']);
+    const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'studybru-orders.csv'; a.click();
+  }
+
+  function summaryToWA() {
+    const orders = getOrders();
+    const pending = orders.filter(o => o.status === 'pending' || o.status === 'confirmed');
+    const revenue = orders.reduce((s,o) => s + (o.total || 0), 0);
+    const msg = `📊 *StudyBru Order Summary*\n\nTotal Orders: ${orders.length}\nPending: ${pending.length}\nRevenue: R${revenue}\nDelivered: ${orders.filter(o=>o.status==='delivered').length}\n\n${pending.length ? '*Pending Orders:*\n' + pending.slice(-5).map(o=>`• ${o.ref} — ${o.name} — ${o.pack} — ${o.date}`).join('\n') : '✅ All orders delivered!'}`;
+    window.open(`https://wa.me/${OWNER_WA}?text=${encodeURIComponent(msg)}`, '_blank');
+  }
+
+  function embedSheet() {
+    const url = document.getElementById('sheet-url').value.trim();
+    if (!url) { alert('Please paste a Google Sheet embed URL.'); return; }
+    const iframe = document.getElementById('sheet-iframe');
+    const placeholder = document.getElementById('sheet-placeholder');
+    iframe.src = url;
+    iframe.style.display = 'block';
+    placeholder.style.display = 'none';
+    document.getElementById('sheet-status-label').textContent = '✅ Connected';
+    document.getElementById('sheet-status-label').style.color = 'var(--accent)';
+    localStorage.setItem('sb_sheet_url', url);
+  }
+
+  // Restore saved sheet URL
+  const savedUrl = localStorage.getItem('sb_sheet_url');
+  if (savedUrl) {
+    document.getElementById('sheet-url').value = savedUrl;
+  }
+
+  document.getElementById('admin-pin-input').addEventListener('keydown', e => { if(e.key==='Enter') tryUnlock(); });
+</script>
+</body>
+</html>

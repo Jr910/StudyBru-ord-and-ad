@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The Study Snack Bru — Exam Fuel Delivered</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --card: #161616;
+    --border: #2a2a2a;
+    --accent: #c8f135;
+    --accent2: #ff4d6d;
+    --text: #f0f0f0;
+    --muted: #888;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+
+  /* NAV */
+  nav{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100;}
+  .nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;letter-spacing:-0.5px;}
+  .nav-logo span{color:var(--accent);}
+  .nav-tabs{display:flex;gap:8px;}
+  .nav-tab{padding:8px 16px;border-radius:30px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:0.85rem;cursor:pointer;transition:all .2s;}
+  .nav-tab.active,.nav-tab:hover{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600;}
+
+  /* SECTIONS */
+  section{display:none;padding:24px 20px 80px;max-width:560px;margin:0 auto;}
+  section.active{display:block;}
+
+  /* HERO */
+  .hero{text-align:center;padding:32px 0 24px;}
+  .hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;line-height:1.1;letter-spacing:-1px;}
+  .hero h1 span{color:var(--accent);}
+  .hero p{color:var(--muted);margin-top:8px;font-size:0.9rem;}
+
+  /* PACKS */
+  .packs{display:grid;gap:12px;margin-bottom:24px;}
+  .pack-card{border:2px solid var(--border);border-radius:var(--radius);padding:18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+  .pack-card:hover{border-color:#444;}
+  .pack-card.selected{border-color:var(--accent);background:#1a1f0a;}
+  .pack-card.selected::before{content:'✓';position:absolute;top:14px;right:14px;background:var(--accent);color:#000;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;}
+  .pack-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+  .pack-name{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;}
+  .pack-price{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--accent);}
+  .pack-tagline{color:var(--muted);font-size:0.8rem;font-style:italic;margin-bottom:10px;}
+  .pack-items{display:flex;flex-wrap:wrap;gap:6px;}
+  .pack-item{background:#1e1e1e;border-radius:6px;padding:4px 10px;font-size:0.78rem;color:#ccc;}
+
+  /* FORM */
+  .section-label{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+  .section-label .dot{width:8px;height:8px;background:var(--accent);border-radius:50%;display:inline-block;}
+  .form-group{margin-bottom:14px;}
+  .form-group label{display:block;font-size:0.8rem;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;}
+  .form-group input,.form-group select{width:100%;background:#1a1a1a;border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.95rem;outline:none;transition:border .2s;}
+  .form-group input:focus,.form-group select:focus{border-color:var(--accent);}
+  .form-group select option{background:#1a1a1a;}
+  .err{color:var(--accent2);font-size:0.78rem;margin-top:4px;display:none;}
+  .err.show{display:block;}
+
+  /* QTY */
+  .qty-row{display:flex;align-items:center;gap:14px;}
+  .qty-btn{width:38px;height:38px;border-radius:8px;border:1px solid var(--border);background:#1a1a1a;color:var(--text);font-size:1.2rem;cursor:pointer;transition:all .2s;}
+  .qty-btn:hover{background:var(--accent);color:#000;border-color:var(--accent);}
+  #qty-display{font-family:'Syne',sans-serif;font-weight:700;font-size:1.2rem;min-width:30px;text-align:center;}
+
+  /* PAYMENT */
+  .pay-options{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+  .pay-btn{border:2px solid var(--border);border-radius:var(--radius);padding:14px 8px;text-align:center;cursor:pointer;transition:all .2s;background:transparent;}
+  .pay-btn:hover{border-color:#555;}
+  .pay-btn.selected{border-color:var(--accent);background:#1a1f0a;}
+  .pay-icon{font-size:1.4rem;display:block;margin-bottom:4px;}
+  .pay-label{font-size:0.75rem;font-weight:600;color:var(--text);}
+  .pay-sub{font-size:0.68rem;color:var(--muted);}
+
+  /* TOTAL BAR */
+  .total-bar{background:#1a1a1a;border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin:16px 0;display:flex;justify-content:space-between;align-items:center;}
+  .total-label{color:var(--muted);font-size:0.85rem;}
+  .total-amount{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--accent);}
+
+  /* SUBMIT BTN */
+  .btn-primary{width:100%;padding:16px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;transition:all .2s;letter-spacing:.5px;}
+  .btn-primary:hover{background:#d4ff40;transform:translateY(-1px);}
+  .btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+
+  /* WHATSAPP NOTICE */
+  .wa-notice{background:#0d2116;border:1px solid #1a5c36;border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;display:flex;gap:12px;align-items:flex-start;}
+  .wa-notice .wa-icon{font-size:1.5rem;flex-shrink:0;margin-top:2px;}
+  .wa-notice p{font-size:0.85rem;line-height:1.5;color:#a8e6c2;}
+  .wa-notice strong{color:#4ade80;display:block;margin-bottom:2px;}
+
+  /* ORDER SUCCESS */
+  .success-card{text-align:center;background:var(--card);border:2px solid var(--accent);border-radius:20px;padding:32px 24px;}
+  .success-icon{font-size:3rem;margin-bottom:12px;}
+  .success-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:var(--accent);margin-bottom:6px;}
+  .success-sub{color:var(--muted);font-size:0.85rem;margin-bottom:24px;}
+  .ref-badge{background:#1a1a1a;border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:0.8rem;color:var(--muted);margin-bottom:16px;}
+  .ref-badge span{color:var(--text);font-weight:600;}
+  .pin-box{background:#1a1f0a;border:2px solid var(--accent);border-radius:var(--radius);padding:20px;margin:16px 0;}
+  .pin-label{font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+  .pin-number{font-family:'Syne',sans-serif;font-weight:800;font-size:2.5rem;letter-spacing:8px;color:var(--accent);}
+  .pin-hint{font-size:0.75rem;color:var(--muted);margin-top:6px;}
+
+  /* POST-ORDER WA STEP */
+  .wa-step{background:#0d2116;border:2px solid #1a5c36;border-radius:var(--radius);padding:20px;margin:20px 0;text-align:left;}
+  .wa-step-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:#4ade80;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+  .wa-step p{font-size:0.85rem;color:#a8e6c2;line-height:1.6;margin-bottom:12px;}
+  .btn-wa{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#25D366;color:#fff;border:none;border-radius:var(--radius);font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;cursor:pointer;text-decoration:none;transition:all .2s;}
+  .btn-wa:hover{background:#1fb855;}
+
+  .success-actions{display:grid;gap:10px;margin-top:16px;}
+  .btn-outline{width:100%;padding:13px;background:transparent;color:var(--text);border:1px solid var(--border);border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-weight:600;font-size:0.9rem;cursor:pointer;transition:all .2s;}
+  .btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+
+  /* TRACK */
+  .track-form{display:flex;gap:10px;margin-bottom:24px;}
+  .track-input{flex:1;background:#1a1a1a;border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.95rem;outline:none;}
+  .track-input:focus{border-color:var(--accent);}
+  .btn-find{padding:12px 20px;background:var(--accent);color:#000;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;}
+  .track-hint{font-size:0.78rem;color:var(--muted);margin-top:-18px;margin-bottom:20px;}
+
+  .order-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;}
+  .order-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+  .order-ref{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;}
+  .status-badge{padding:4px 12px;border-radius:30px;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+  .status-pending{background:#2a1f00;color:#f9a825;}
+  .status-confirmed{background:#1a1f0a;color:var(--accent);}
+  .status-paid{background:#0d2116;color:#4ade80;}
+  .status-delivered{background:#0d1a2a;color:#60a5fa;}
+  .status-cancelled{background:#2a0d0d;color:var(--accent2);}
+
+  .progress-track{display:flex;align-items:center;gap:0;margin:16px 0;}
+  .prog-step{flex:1;text-align:center;}
+  .prog-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;margin:0 auto 4px;font-size:0.75rem;position:relative;z-index:1;}
+  .prog-dot.done{background:var(--accent);border-color:var(--accent);color:#000;font-weight:700;}
+  .prog-dot.active{border-color:var(--accent);color:var(--accent);}
+  .prog-label{font-size:0.65rem;color:var(--muted);}
+  .prog-line{flex:1;height:2px;background:var(--border);margin-top:-18px;}
+  .prog-line.done{background:var(--accent);}
+
+  .order-detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.85rem;}
+  .order-detail-row:last-child{border:none;}
+  .order-detail-row .key{color:var(--muted);}
+  .order-detail-row .val{font-weight:600;text-align:right;}
+
+  .not-found{text-align:center;padding:40px 20px;color:var(--muted);}
+  .not-found .nf-icon{font-size:2.5rem;margin-bottom:12px;}
+
+  /* ANIMATIONS */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .fade-up{animation:fadeUp .4s ease forwards;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Study<span>Bru</span> 🎒</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('order')">🛒 Order</button>
+    <button class="nav-tab" onclick="showSection('track')">📍 Track</button>
+  </div>
+</nav>
+
+<!-- ORDER SECTION -->
+<section id="sec-order" class="active">
+  <div class="hero fade-up">
+    <h1>Exam fuel —<br><span>delivered to you 💪</span></h1>
+    <p>Study packs delivered to your school door</p>
+  </div>
+
+  <!-- PACK SELECTION -->
+  <div class="section-label"><span class="dot"></span> Choose Your Pack</div>
+  <div class="packs" id="pack-container">
+    <div class="pack-card" onclick="selectPack(this,'Survival Pack',150)">
+      <div class="pack-top"><span class="pack-name">Survival Pack</span><span class="pack-price">R150</span></div>
+      <div class="pack-tagline">"Get through the night. Ace the morning."</div>
+      <div class="pack-items">
+        <span class="pack-item">1× Red Bull / Monster</span>
+        <span class="pack-item">2× Mixed Peanuts</span>
+        <span class="pack-item">2× Bio Plus</span>
+        <span class="pack-item">2× Jungle Bars</span>
+      </div>
+    </div>
+    <div class="pack-card" onclick="selectPack(this,'Ace\'s Pack',250)">
+      <div class="pack-top"><span class="pack-name">Ace's Pack</span><span class="pack-price">R250</span></div>
+      <div class="pack-tagline">"For the ones who came to win."</div>
+      <div class="pack-items">
+        <span class="pack-item">1× Red Bull</span>
+        <span class="pack-item">1× Powerade / Energade</span>
+        <span class="pack-item">3× Mixed Peanuts</span>
+        <span class="pack-item">3× Jungle Bars</span>
+        <span class="pack-item">3× Bio Plus</span>
+        <span class="pack-item">Doritos / Lay's / Sweets</span>
+      </div>
+    </div>
+  </div>
+  <div class="err" id="err-pack">⚠ Please select a pack to continue</div>
+
+  <!-- WA NOTICE (shown before form fill) -->
+  <div class="wa-notice">
+    <span class="wa-icon">💬</span>
+    <p><strong>After placing your order — WhatsApp us!</strong>
+    Send your order reference & PIN to <strong>069 674 6666</strong> on WhatsApp to confirm your delivery. Don't skip this step!</p>
+  </div>
+
+  <!-- YOUR DETAILS -->
+  <div class="section-label"><span class="dot"></span> Your Details</div>
+  <p style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;">🔐 You'll get a unique 6-digit PIN after ordering. Use it to track and collect your pack.</p>
+
+  <div class="form-group">
+    <label>Full Name</label>
+    <input type="text" id="inp-name" placeholder="e.g. Thabo Mokoena"/>
+    <div class="err" id="err-name">⚠ Please enter your name</div>
+  </div>
+  <div class="form-group">
+    <label>WhatsApp Number</label>
+    <input type="tel" id="inp-wa" placeholder="e.g. 082 345 6789"/>
+    <div class="err" id="err-wa">⚠ Please enter your WhatsApp number</div>
+  </div>
+  <div class="form-group">
+    <label>School Name</label>
+    <input type="text" id="inp-school" placeholder="e.g. Northside High"/>
+    <div class="err" id="err-school">⚠ Please enter your school</div>
+  </div>
+  <div class="form-group">
+    <label>Grade / Class</label>
+    <select id="inp-grade">
+      <option value="">Select your grade</option>
+      <option>Grade 8</option><option>Grade 9</option><option>Grade 10</option><option>Grade 11</option><option>Grade 12</option>
+    </select>
+    <div class="err" id="err-grade">⚠ Please select your grade</div>
+  </div>
+  <div class="form-group">
+    <label>Delivery Date Needed</label>
+    <input type="date" id="inp-date"/>
+    <div class="err" id="err-date">⚠ Please choose a delivery date</div>
+  </div>
+
+  <!-- QUANTITY -->
+  <div class="form-group">
+    <label>Quantity</label>
+    <div class="qty-row">
+      <button class="qty-btn" onclick="changeQty(-1)">−</button>
+      <span id="qty-display">1</span>
+      <button class="qty-btn" onclick="changeQty(1)">+</button>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Special Request (optional)</label>
+    <input type="text" id="inp-notes" placeholder="Any allergies, extras, etc."/>
+  </div>
+
+  <!-- PAYMENT -->
+  <div class="section-label"><span class="dot"></span> How will you pay?</div>
+  <div class="pay-options">
+    <div class="pay-btn" onclick="selectPay(this,'Card')">
+      <span class="pay-icon">💳</span>
+      <div class="pay-label">Card</div>
+      <div class="pay-sub">Yoco tap</div>
+    </div>
+    <div class="pay-btn" onclick="selectPay(this,'EFT')">
+      <span class="pay-icon">📲</span>
+      <div class="pay-label">EFT</div>
+      <div class="pay-sub">PayShap</div>
+    </div>
+    <div class="pay-btn" onclick="selectPay(this,'Cash')">
+      <span class="pay-icon">💵</span>
+      <div class="pay-label">Cash</div>
+      <div class="pay-sub">On delivery</div>
+    </div>
+  </div>
+  <div class="err" id="err-pay">⚠ Please select a payment method</div>
+
+  <!-- TOTAL -->
+  <div class="total-bar">
+    <span class="total-label">TOTAL (<span id="total-qty">1</span>× pack)</span>
+    <span class="total-amount" id="total-display">R0</span>
+  </div>
+
+  <button class="btn-primary" id="place-btn" onclick="placeOrder()">PLACE MY ORDER 🚀</button>
+</section>
+
+<!-- TRACK SECTION -->
+<section id="sec-track">
+  <div class="hero fade-up">
+    <h1>Track your <span>order 📍</span></h1>
+    <p>Enter your PIN or reference to check status</p>
+  </div>
+  <div class="track-form">
+    <input class="track-input" id="track-input" type="text" placeholder="PIN or ref e.g. SB-4521"/>
+    <button class="btn-find" onclick="trackOrder()">FIND</button>
+  </div>
+  <p class="track-hint">e.g. 482910 or SB-4521</p>
+  <div id="track-result"></div>
+</section>
+
+<!-- SUCCESS OVERLAY -->
+<section id="sec-success">
+  <div class="success-card fade-up">
+    <div class="success-icon">✅</div>
+    <div class="success-title">ORDER PLACED!</div>
+    <div class="success-sub">Pack confirmed 🎉 Save your PIN below.</div>
+
+    <div class="ref-badge">Ref: <span id="suc-ref">SB-0000</span></div>
+
+    <div class="pin-box">
+      <div class="pin-label">🔐 Your Order PIN</div>
+      <div class="pin-number" id="suc-pin">000000</div>
+      <div class="pin-hint">Use this PIN to track & collect your pack.<br>Don't share it until you've received your order.</div>
+    </div>
+
+    <!-- WHATSAPP STEP — KEY ADDITION -->
+    <div class="wa-step">
+      <div class="wa-step-title">💬 Step 2 — WhatsApp us now!</div>
+      <p>To confirm your delivery, send your <strong>order reference & PIN</strong> to The Study Snack Bru on WhatsApp. Orders without a WhatsApp confirmation may be delayed.</p>
+      <a class="btn-wa" id="wa-confirm-btn" href="#" target="_blank">
+        📲 Send WhatsApp Confirmation
+      </a>
+    </div>
+
+    <div class="success-actions">
+      <button class="btn-outline" onclick="showSection('track'); trackFromSuccess()">📍 Track This Order</button>
+      <button class="btn-outline" onclick="resetOrder()">Place Another Order</button>
+    </div>
+  </div>
+</section>
+
+<script>
+  const OWNER_WA = '27696746666'; // 0696746666 in international format
+  let selectedPack = null;
+  let selectedPackPrice = 0;
+  let selectedPayment = null;
+  let qty = 1;
+  let lastOrder = null;
+
+  function showSection(name) {
+    document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('sec-' + name).classList.add('active');
+    if (name === 'order') document.querySelectorAll('.nav-tab')[0].classList.add('active');
+    if (name === 'track') document.querySelectorAll('.nav-tab')[1].classList.add('active');
+  }
+
+  function selectPack(el, name, price) {
+    document.querySelectorAll('.pack-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedPack = name;
+    selectedPackPrice = price;
+    document.getElementById('err-pack').classList.remove('show');
+    updateTotal();
+  }
+
+  function selectPay(el, method) {
+    document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedPayment = method;
+    document.getElementById('err-pay').classList.remove('show');
+  }
+
+  function changeQty(d) {
+    qty = Math.max(1, Math.min(10, qty + d));
+    document.getElementById('qty-display').textContent = qty;
+    updateTotal();
+  }
+
+  function updateTotal() {
+    const total = selectedPackPrice * qty;
+    document.getElementById('total-display').textContent = 'R' + total;
+    document.getElementById('total-qty').textContent = qty;
+  }
+
+  function validate() {
+    let ok = true;
+    if (!selectedPack) { document.getElementById('err-pack').classList.add('show'); ok = false; }
+    if (!document.getElementById('inp-name').value.trim()) { document.getElementById('err-name').classList.add('show'); ok = false; } else { document.getElementById('err-name').classList.remove('show'); }
+    if (!document.getElementById('inp-wa').value.trim()) { document.getElementById('err-wa').classList.add('show'); ok = false; } else { document.getElementById('err-wa').classList.remove('show'); }
+    if (!document.getElementById('inp-school').value.trim()) { document.getElementById('err-school').classList.add('show'); ok = false; } else { document.getElementById('err-school').classList.remove('show'); }
+    if (!document.getElementById('inp-grade').value) { document.getElementById('err-grade').classList.add('show'); ok = false; } else { document.getElementById('err-grade').classList.remove('show'); }
+    if (!document.getElementById('inp-date').value) { document.getElementById('err-date').classList.add('show'); ok = false; } else { document.getElementById('err-date').classList.remove('show'); }
+    if (!selectedPayment) { document.getElementById('err-pay').classList.add('show'); ok = false; }
+    return ok;
+  }
+
+  function genPIN() { return String(Math.floor(100000 + Math.random() * 900000)); }
+  function genRef() { return 'SB-' + Math.floor(1000 + Math.random() * 9000); }
+
+  function placeOrder() {
+    if (!validate()) return;
+    const pin = genPIN();
+    const ref = genRef();
+    const name = document.getElementById('inp-name').value.trim();
+    const wa = document.getElementById('inp-wa').value.trim();
+    const school = document.getElementById('inp-school').value.trim();
+    const grade = document.getElementById('inp-grade').value;
+    const date = document.getElementById('inp-date').value;
+    const notes = document.getElementById('inp-notes').value.trim();
+    const total = selectedPackPrice * qty;
+
+    lastOrder = { ref, pin, name, wa, school, grade, date, pack: selectedPack, qty, payment: selectedPayment, notes, total, status: 'pending', timestamp: Date.now() };
+
+    // Save to localStorage
+    const orders = JSON.parse(localStorage.getItem('sb_orders') || '[]');
+    orders.push(lastOrder);
+    localStorage.setItem('sb_orders', JSON.stringify(orders));
+
+    // Show success
+    document.getElementById('suc-ref').textContent = ref;
+    document.getElementById('suc-pin').textContent = pin;
+
+    // Build WhatsApp message
+    const msg = encodeURIComponent(
+      `Hi Study Snack Bru! 👋\n\nI just placed an order and need to confirm:\n\n📦 *${selectedPack}* ×${qty}\n🔖 Ref: *${ref}*\n🔐 PIN: *${pin}*\n👤 Name: ${name}\n🏫 ${school} — ${grade}\n📅 Needed by: ${date}\n💳 Payment: ${selectedPayment}\n💰 Total: R${total}${notes ? '\n📝 Note: ' + notes : ''}`
+    );
+    document.getElementById('wa-confirm-btn').href = `https://wa.me/${OWNER_WA}?text=${msg}`;
+
+    showSection('success');
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  }
+
+  function trackOrder() {
+    const val = document.getElementById('track-input').value.trim();
+    const orders = JSON.parse(localStorage.getItem('sb_orders') || '[]');
+    const o = orders.find(x => x.pin === val || x.ref.toLowerCase() === val.toLowerCase());
+    const el = document.getElementById('track-result');
+    if (!o) {
+      el.innerHTML = `<div class="not-found"><div class="nf-icon">🔍</div><p>Order Not Found</p><small>Double-check your PIN or ref. Orders only appear on the device they were placed on.</small></div>`;
+      return;
+    }
+    const statuses = ['pending','confirmed','paid','delivered'];
+    const statusIdx = statuses.indexOf(o.status);
+    const statusLabels = ['Ordered','Confirmed','Paid','Delivered'];
+    const statusIcons = ['📋','✓','💳','📦'];
+    const stepsHtml = statuses.map((s,i) => {
+      const dotClass = i < statusIdx ? 'done' : i === statusIdx ? 'active' : '';
+      const lineClass = i < statusIdx ? 'done' : '';
+      return `${i>0?`<div class="prog-line ${lineClass}"></div>`:''}
+        <div class="prog-step">
+          <div class="prog-dot ${dotClass}">${statusIcons[i]}</div>
+          <div class="prog-label">${statusLabels[i]}</div>
+        </div>`;
+    }).join('');
+
+    el.innerHTML = `<div class="order-card fade-up">
+      <div class="order-card-header">
+        <span class="order-ref">${o.ref}</span>
+        <span class="status-badge status-${o.status}">${o.status.toUpperCase()}</span>
+      </div>
+      <div class="progress-track">${stepsHtml}</div>
+      <div style="font-size:0.7rem;color:var(--muted);text-align:center;margin-bottom:12px;">🔒 View only — only The Study Snack Bru can update your status</div>
+      <div class="order-detail-row"><span class="key">Pack</span><span class="val">${o.pack}</span></div>
+      <div class="order-detail-row"><span class="key">Quantity</span><span class="val">×${o.qty}</span></div>
+      <div class="order-detail-row"><span class="key">Delivery needed by</span><span class="val">${o.date}</span></div>
+      <div class="order-detail-row"><span class="key">Name</span><span class="val">${o.name}</span></div>
+      <div class="order-detail-row"><span class="key">School</span><span class="val">${o.school}</span></div>
+      <div class="order-detail-row"><span class="key">Grade</span><span class="val">${o.grade}</span></div>
+      <div class="order-detail-row"><span class="key">Payment</span><span class="val">${o.payment}</span></div>
+      <div class="order-detail-row"><span class="key">Total</span><span class="val" style="color:var(--accent)">R${o.total}</span></div>
+      <div class="pin-box" style="margin-top:12px;">
+        <div class="pin-label">🔐 Your Order PIN</div>
+        <div class="pin-number">${o.pin}</div>
+        <div class="pin-hint">Show this PIN when collecting your pack.</div>
+      </div>
+    </div>`;
+  }
+
+  function trackFromSuccess() {
+    if (lastOrder) {
+      document.getElementById('track-input').value = lastOrder.pin;
+      trackOrder();
+    }
+  }
+
+  function resetOrder() {
+    selectedPack = null; selectedPackPrice = 0; selectedPayment = null; qty = 1;
+    document.querySelectorAll('.pack-card').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('inp-name').value = '';
+    document.getElementById('inp-wa').value = '';
+    document.getElementById('inp-school').value = '';
+    document.getElementById('inp-grade').value = '';
+    document.getElementById('inp-date').value = '';
+    document.getElementById('inp-notes').value = '';
+    document.getElementById('qty-display').textContent = '1';
+    document.getElementById('total-display').textContent = 'R0';
+    document.getElementById('total-qty').textContent = '1';
+    showSection('order');
+    document.querySelectorAll('.nav-tab')[0].classList.add('active');
+  }
+
+  // Set min date to today
+  document.getElementById('inp-date').min = new Date().toISOString().split('T')[0];
+</script>
+</body>
+</html>
